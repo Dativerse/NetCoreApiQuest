@@ -1,6 +1,7 @@
 using System.Net;
 using Contracts;
 using Entities.ErrorModels;
+using Entities.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 
 namespace CompanyEmployees.Extensions;
@@ -19,6 +20,13 @@ public static class ExceptionMiddlewareExtensions
         if (contextFeature != null)
         {
           logger.LogError($"Something went wrong: {contextFeature.Error}");
+          context.Response.StatusCode = contextFeature.Error switch
+          {
+            NotFoundException => StatusCodes.Status404NotFound,
+            BadRequestException => StatusCodes.Status400BadRequest,
+            _ => StatusCodes.Status500InternalServerError
+          };
+
           await context.Response.WriteAsync(new ErrorDetails()
           {
             StatusCode = context.Response.StatusCode,

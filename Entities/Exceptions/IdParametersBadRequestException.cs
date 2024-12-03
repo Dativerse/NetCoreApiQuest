@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Entities.Exceptions
 {
-  internal class IdParametersBadRequestException
+  public sealed class IdParametersBadRequestException : BadRequestException
   {
+    public IdParametersBadRequestException()
+     : base("Parameter ids is null")
+    {
+    }
   }
 }

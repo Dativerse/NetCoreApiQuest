@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Entities.Exceptions
 {
-  internal class CollectionByIdsBadRequestException
+  public sealed class CollectionByIdsBadRequestException : BadRequestException
   {
+    public CollectionByIdsBadRequestException()
+     : base("Collection count mismatch comparing to ids.")
+    {
+    }
   }
 }
