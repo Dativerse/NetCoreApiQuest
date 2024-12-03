@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contracts;
 using Entities.Exceptions;
+using Entities.Models;
 using Service.Contracts;
 using Shared.DataTransferObjects;
 
@@ -23,5 +24,16 @@ internal class CompanyService(IRepositoryManager repository, ILoggerManager logg
     var companyDto = mapper.Map<CompanyDto>(company);
 
     return companyDto;
+  }
+
+  public CompanyDto CreateCompany(CompanyForCreationDto company)
+  {
+    var companyEntity = mapper.Map<Company>(company);
+    repository.Company.CreateCompany(companyEntity);
+    repository.Save();
+
+    var companyToReturn = mapper.Map<CompanyDto>(companyEntity);
+
+    return companyToReturn;
   }
 }
