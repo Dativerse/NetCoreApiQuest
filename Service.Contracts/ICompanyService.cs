@@ -1,6 +1,11 @@
-﻿namespace Service.Contracts
+﻿using Entities.Models;
+using Shared.DataTransferObjects;
+
+namespace Service.Contracts
 {
-    public interface ICompanyService
-    {
-    }
+  public interface ICompanyService
+  {
+    IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges);
+    CompanyDto GetCompany(Guid companyId, bool trackChanges);
+  }
 }

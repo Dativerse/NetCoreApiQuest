@@ -1,17 +1,29 @@
-﻿using Contracts;
+﻿using AutoMapper;
+using Contracts;
+using Entities.Exceptions;
 using Service.Contracts;
+using Shared.DataTransferObjects;
 
-namespace Service
+namespace Service;
+
+public class EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper) : IEmployeeService
 {
-    internal class EmployeeService : IEmployeeService
-    {
-        private readonly IRepositoryManager _repository;
-        private readonly ILoggerManager _logger;
+  public IEnumerable<EmployeeDto> GetEmployees(Guid companyId, bool trackChanges)
+  {
+    var company = repository.Company.GetCompany(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
+    var employeesFromDb = repository.Employee.GetEmployees(companyId,trackChanges);
 
-        public EmployeeService(IRepositoryManager repository, ILoggerManager logger)
-        {
-            _repository = repository;
-            _logger = logger;
-        }
-    }
+    var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
+
+    return employeesDto;
+  }
+  public EmployeeDto GetEmployee(Guid companyId, Guid id, bool trackChanges)
+  {
+    var company = repository.Company.GetCompany(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
+    var employeeDb = repository.Employee.GetEmployee(companyId, id, trackChanges) ?? throw new EmployeeNotFoundException(id);
+
+    var employee = mapper.Map<EmployeeDto>(employeeDb);
+
+    return employee;
+  }
 }

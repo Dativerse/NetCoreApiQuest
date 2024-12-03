@@ -1,18 +1,27 @@
-﻿using Contracts;
+﻿using AutoMapper;
+using Contracts;
+using Entities.Exceptions;
 using Service.Contracts;
+using Shared.DataTransferObjects;
 
-namespace Service
+namespace Service;
+
+internal class CompanyService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper) : ICompanyService
 {
-    internal class CompanyService : ICompanyService
-    {
-        private readonly IRepositoryManager _repository;
-        private readonly ILoggerManager _logger;
+  public IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges)
+  {
+    var companies = repository.Company.GetAllCompanies(trackChanges);
 
-        public CompanyService(IRepositoryManager repository, ILoggerManager
-        logger)
-        {
-            _repository = repository;
-            _logger = logger;
-        }
-    }
+    var companiesDto = mapper.Map<IEnumerable<CompanyDto>>(companies);
+
+    return companiesDto;
+  }
+
+  public CompanyDto GetCompany(Guid id, bool trackChanges)
+  {
+    var company = repository.Company.GetCompany(id, trackChanges) ?? throw new CompanyNotFoundException(id);
+    var companyDto = mapper.Map<CompanyDto>(company);
+
+    return companyDto;
+  }
 }
