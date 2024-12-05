@@ -1,5 +1,4 @@
-﻿using Entities.Models;
-using Shared.DataTransferObjects;
+﻿using Shared.DataTransferObjects;
 
 namespace Service.Contracts
 {

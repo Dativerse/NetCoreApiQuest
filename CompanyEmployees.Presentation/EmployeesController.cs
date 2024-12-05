@@ -31,6 +31,6 @@ public class EmployeesController(IServiceManager service) : ControllerBase
 
     var employeeToReturn = service.EmployeeService.CreateEmployeeForCompany(companyId, employee, trackChanges: false);
 
-    return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employeeToReturn.Id },employeeToReturn);
+    return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employeeToReturn.Id }, employeeToReturn);
   }
 }
