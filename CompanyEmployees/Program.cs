@@ -3,6 +3,9 @@ using CompanyEmployees.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using CompanyEmployees;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc.Formatters; 
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +30,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddControllers(config => {
   config.RespectBrowserAcceptHeader = true;
   config.ReturnHttpNotAcceptable = true;
-}).AddXmlDataContractSerializerFormatters().AddCustomCSVFormatter().AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
+  config.InputFormatters.Insert(0, SystemJsonPatchFormatter.GetJsonPatchInputFormatter());
+}).AddXmlDataContractSerializerFormatters().AddCustomCSVFormatter().AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly).AddNewtonsoftJson();
 
 var app = builder.Build();
 
@@ -49,3 +53,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

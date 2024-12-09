@@ -45,4 +45,22 @@ internal class CompanyService(IRepositoryManager repository, ILoggerManager logg
     var companiesToReturn = mapper.Map<IEnumerable<CompanyDto>>(companyEntities);
     return companiesToReturn;
   }
+
+  public void DeleteCompany(Guid companyId, bool trackChanges)
+  {
+    var company = repository.Company.GetCompany(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
+
+    repository.Company.DeleteCompany(company);
+
+    repository.Save();
+  }
+
+  public void UpdateCompany(Guid companyId, CompanyForUpdateDto companyForUpdate, bool trackChanges)
+  {
+    var companyEntity = repository.Company.GetCompany(companyId, trackChanges) ?? throw new CompanyNotFoundException(companyId);
+    
+    mapper.Map(companyForUpdate, companyEntity);
+
+    repository.Save();
+  }
 }

@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using Entities.Exceptions;
 using Entities.Models;
 
 namespace Repository
@@ -14,5 +15,7 @@ namespace Repository
       employee.CompanyId = companyId;
       Create(employee);
     }
+
+    public void DeleteEmployee(Employee employee) => Delete(employee);
   }
 }

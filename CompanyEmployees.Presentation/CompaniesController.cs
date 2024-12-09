@@ -1,3 +1,4 @@
+using CompanyEmployees.Presentation.ModelBinders;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
@@ -33,10 +34,27 @@ public class CompaniesController(IServiceManager service) : ControllerBase
   }
 
   [HttpGet("collection/({ids})", Name = "CompanyCollection")]
-  public IActionResult GetCompanyCollection(IEnumerable<Guid> ids)
+  public IActionResult GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]IEnumerable<Guid> ids)
   {
     var companies = service.CompanyService.GetByIds(ids, trackChanges: false);
 
     return Ok(companies);
+  }
+
+  [HttpDelete("{id:guid}")]
+  public IActionResult DeleteCompany(Guid id)
+  {
+    service.CompanyService.DeleteCompany(id, trackChanges: false);
+    return NoContent();
+  }
+
+  [HttpPut("{id:guid}")]
+  public IActionResult UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
+  {
+    if (company is null) return BadRequest("CompanyForUpdateDto object is null");
+
+    service.CompanyService.UpdateCompany(id, company, trackChanges: true);
+
+    return NoContent();
   }
 }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObjects;
@@ -29,8 +30,46 @@ public class EmployeesController(IServiceManager service) : ControllerBase
   {
     if (employee is null) return BadRequest("EmployeeForCreationDto object is null");
 
+    if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
+
     var employeeToReturn = service.EmployeeService.CreateEmployeeForCompany(companyId, employee, trackChanges: false);
 
     return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employeeToReturn.Id }, employeeToReturn);
+  }
+
+  [HttpDelete("{id:guid}")]
+  public IActionResult DeleteEmployeeForCompany(Guid companyId, Guid id)
+  {
+    service.EmployeeService.DeleteEmployeeForCompany(companyId, id, trackChanges: false);
+    return NoContent();
+  }
+
+  [HttpPut("{id:guid}")]
+  public IActionResult UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeForUpdateDto employee)
+  {
+    if (employee is null) return BadRequest("EmployeeForUpdateDto object is null");
+
+    if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
+
+    service.EmployeeService.UpdateEmployeeForCompany(companyId, id, employee, compTrackChanges: false, empTrackChanges: true);
+    return NoContent();
+  }
+
+  [HttpPatch("{id:guid}")]
+  public IActionResult PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDoc)
+  {
+    if (patchDoc is null) return BadRequest("patchDoc object sent from client is null.");
+
+    var result = service.EmployeeService.GetEmployeeForPatch(companyId, id, compTrackChanges: false, empTrackChanges: true);
+
+    patchDoc.ApplyTo(result.employeeToPatch, ModelState);
+
+    TryValidateModel(result.employeeToPatch);
+
+    if (!ModelState.IsValid) return UnprocessableEntity(ModelState);
+
+    service.EmployeeService.SaveChangesForPatch(result.employeeToPatch, result.employeeEntity);
+
+    return NoContent();
   }
 }
