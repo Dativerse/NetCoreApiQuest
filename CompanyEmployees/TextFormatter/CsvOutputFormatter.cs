@@ -36,7 +36,8 @@ namespace CompanyEmployees.TextFormatter
           FormatCsv(buffer, company);
         }
       }
-      else {
+      else
+      {
         FormatCsv(buffer, (CompanyDto)context.Object);
       }
 
