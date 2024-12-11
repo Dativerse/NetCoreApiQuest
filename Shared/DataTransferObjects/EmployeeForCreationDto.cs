@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Shared.DataTransferObjects
+﻿namespace Shared.DataTransferObjects
 {
   public record EmployeeForCreationDto : EmployeeForManipulationDto
   {
