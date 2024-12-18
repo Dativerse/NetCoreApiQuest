@@ -48,6 +48,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
   ForwardedHeaders = ForwardedHeaders.All
 });
 
+app.MapGet("/", () => "eNViDAT iz da best");
+
 app.UseCors("CorsPolicy");
 app.UseAuthorization();
 

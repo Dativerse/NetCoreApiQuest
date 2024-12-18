@@ -1,4 +1,6 @@
+using System.Text.Json;
 using CompanyEmployees.Presentation.ActionFilters;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -14,9 +16,10 @@ namespace CompanyEmployees.Presentation
     [HttpGet]
     public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
     {
-      var employees = await service.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
+      var pagedResult = await service.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
 
-      return Ok(employees);
+      Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+      return Ok(pagedResult.employees);
     }
 
     [HttpGet("{id:guid}", Name = "GetEmployeeForCompany")]

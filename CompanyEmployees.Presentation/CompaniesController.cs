@@ -33,12 +33,12 @@ namespace CompanyEmployees.Presentation
 
       return CreatedAtRoute("CompanyById", new { id = createdCompany.Id }, createdCompany);
     }
-
+    
     [HttpGet("collection/({ids})", Name = "CompanyCollection")]
     public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
     {
       var companies = await service.CompanyService.GetByIdsAsync(ids, trackChanges: false);
-
+      
       return Ok(companies);
     }
 

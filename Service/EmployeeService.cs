@@ -10,15 +10,16 @@ namespace Service
 {
   public class EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper) : IEmployeeService
   {
-    public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
+    public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
     {
+      if (!employeeParameters.ValidAgeRange) throw new MaxAgeRangeBadRequestException();
       await CheckIfCompanyExists(companyId, trackChanges);
 
-      var employeesFromDb = await repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges);
+      var employeesWithMetaData = await repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges);
 
-      var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
+      var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
 
-      return employeesDto;
+      return (employees: employeesDto, metaData: employeesWithMetaData.MetaData);
     }
 
     public async Task<EmployeeDto> GetEmployeeAsync(Guid companyId, Guid id, bool trackChanges)
