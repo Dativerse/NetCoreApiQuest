@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.HttpOverrides;
 using CompanyEmployees;
 using Microsoft.AspNetCore.Mvc;
 using CompanyEmployees.Presentation.ActionFilters;
+using Contracts;
+using Service.DataShaping;
+using Shared.DataTransferObjects;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,8 @@ builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureLoggerService();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 
 // Add services to the container.
 builder.Services.ConfigureSqlContext(builder.Configuration);

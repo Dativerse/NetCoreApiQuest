@@ -1,16 +1,18 @@
-﻿using AutoMapper;
+﻿using System.Dynamic;
+using AutoMapper;
 using Contracts;
 using Entities.Exceptions;
 using Entities.Models;
 using Service.Contracts;
+using Service.DataShaping;
 using Shared.DataTransferObjects;
 using Shared.RequestFeatures;
 
 namespace Service
 {
-  public class EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper) : IEmployeeService
+  public class EmployeeService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper, IDataShaper<EmployeeDto> dataShaper) : IEmployeeService
   {
-    public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
+    public async Task<(IEnumerable<ExpandoObject> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
     {
       if (!employeeParameters.ValidAgeRange) throw new MaxAgeRangeBadRequestException();
       await CheckIfCompanyExists(companyId, trackChanges);
@@ -18,8 +20,9 @@ namespace Service
       var employeesWithMetaData = await repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges);
 
       var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
+      var shapedData = dataShaper.ShapeData(employeesDto, employeeParameters.Fields);
 
-      return (employees: employeesDto, metaData: employeesWithMetaData.MetaData);
+      return (employees: shapedData, metaData: employeesWithMetaData.MetaData);
     }
 
     public async Task<EmployeeDto> GetEmployeeAsync(Guid companyId, Guid id, bool trackChanges)
